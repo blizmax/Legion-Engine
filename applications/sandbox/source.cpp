@@ -17,6 +17,8 @@
 #include "systems/testsystem.hpp"
 
 #include <physics/PhysicsModule.hpp>
+#include <scripting/scriptmodule.hpp>
+
 
 #include "test_filesystem.hpp"
 
@@ -33,4 +35,5 @@ void LEGION_CCONV reportModules(Engine* engine)
     engine->reportModule<rendering::RenderingModule>();
     engine->reportModule<physics::PhysicsModule>();
     engine->reportModule<audio::AudioModule>();
+    engine->reportModule<scripting::ScriptModule>();
 }

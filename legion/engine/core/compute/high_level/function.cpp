@@ -28,12 +28,10 @@ namespace legion::core::compute
                 m_kernel->set_buffer(buffer, i);
                 i++;
             }
-
             if (buffer.is_readbuffer())
             {
                 m_kernel->enqueue_buffer(buffer);
             }
-
         }
 
         m_kernel->dispatch();
@@ -46,8 +44,8 @@ namespace legion::core::compute
             {
                 m_kernel->enqueue_buffer(buffer);
             }
-
         }
+
         m_kernel->finish();
 
         return common::Ok();
