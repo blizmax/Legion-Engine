@@ -769,7 +769,7 @@ public:
     void onPlayerLookX(player_look_x* action)
     {
         auto rotH = player.get_component_handle<rotation>();
-        rotH.fetch_multiply(math::angleAxis(action->value, math::vec3(0, 1, 0)));
+        rotH.fetch_multiply(math::angleAxis(action->value * action->input_delta * 400.f, math::vec3(0, 1, 0)));
         rotH.read_modify_write(rotation(), [](const rotation& src, rotation&& dummy)
             {
                 (void)dummy;
@@ -787,7 +787,7 @@ public:
     void onPlayerLookY(player_look_y* action)
     {
         auto rotH = player.get_component_handle<rotation>();
-        rotH.fetch_multiply(math::angleAxis(action->value, math::vec3(1, 0, 0)));
+        rotH.fetch_multiply(math::angleAxis(action->value * action->input_delta * 400.f, math::vec3(1, 0, 0)));
         rotH.read_modify_write(rotation(), [](const rotation& src, rotation&& dummy)
             {
                 (void)dummy;
