@@ -180,7 +180,7 @@ public:
 
 
         bindToEvent< extendedPhysicsContinue, &TestSystem::onExtendedPhysicsContinueRequest>();
-        bindToEvent<nextPhysicsTimeStepContinue, &TestSystem::onNextPhysicsTimeStepRequest>();
+        //bindToEvent<nextPhysicsTimeStepContinue, &TestSystem::onNextPhysicsTimeStepRequest>();
 
 #pragma endregion
 
@@ -988,6 +988,8 @@ public:
             idComp.id = "AABBStaticStable";
             idHandle.write(idComp);
 
+        }
+    }
 
     void onPlayerLookX(player_look_x* action)
     {
@@ -1025,7 +1027,6 @@ public:
             });
     }
         
-
     void onUnitPhysicsUnitTestMove(physics_test_move* action)
     {
         for (auto entity : physicsUnitTestCD)
