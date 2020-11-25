@@ -1,7 +1,7 @@
 
-#include <physics/data/edgepenetrationquery.h>
+#include <physics/data/edgepenetrationquery.hpp>
 #include <physics/physics_statics.hpp>
-#include <physics/systems/physicssystem.hpp>
+
 
 
 namespace legion::physics
@@ -11,9 +11,11 @@ namespace legion::physics
         PenetrationQuery(pFaceCentroid,pNormal,pPenetration,pIsARef),refEdge(pRefEdge),incEdge(pIncEdge) {}
 
 
-    void EdgePenetrationQuery::populateContactList(physics_manifold& manifold, math::mat4& refTransform, math::mat4 incTransform)
+    void EdgePenetrationQuery::populateContactList(physics_manifold& manifold,
+        math::mat4& refTransform, math::mat4 incTransform, std::shared_ptr<PhysicsCollider> refCollider)
     {
         //------------------- The contact points between 2 edges are the closest points between the 2 edges --------------------//
+        //log::debug("EdgePenetrationQuery::populateContactList");
 
         math::vec3 p1 = refTransform * math::vec4(*refEdge->edgePositionPtr, 1);
         math::vec3 p2 = refTransform * math::vec4(*refEdge->nextEdge->edgePositionPtr, 1);
@@ -28,14 +30,19 @@ namespace legion::physics
 
         physics_contact contact;
 
-        contact.incTransform = incTransform;
-        contact.refTransform = refTransform;
+        auto refLabel = refEdge->label;
+        auto incLabel = incEdge->label;
 
-        contact.worldContactInc = incContactPoint;
-        contact.worldContactRef = refContactPoint;
+        contact.label = EdgeLabel(std::make_pair(refLabel.firstEdge.first, refLabel.firstEdge.second),
+            std::make_pair(incLabel.nextEdge.first, incLabel.nextEdge.second));
+
+        contact.refCollider = refCollider;
+        contact.IncWorldContact = incContactPoint;
+        contact.RefWorldContact = refContactPoint;
+
+        refCollider->AttemptFindAndCopyConverganceID(contact);
 
         manifold.contacts.push_back(contact);
-        PhysicsSystem::contactPoints.push_back(contact);
 
     }
 

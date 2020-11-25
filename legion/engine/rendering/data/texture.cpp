@@ -24,30 +24,41 @@ namespace legion::rendering
 
     sparse_map<id_type, texture> TextureCache::m_textures;
     async::readonly_rw_spinlock TextureCache::m_textureLock;
+    texture_handle TextureCache::m_invalidTexture;
 
-    texture_data texture_handle::get_data()
+    texture_data texture_handle::get_data() const
     {
         return TextureCache::get_data(id);
     }
 
-    const texture& texture_handle::get_texture()
+    const texture& texture_handle::get_texture() const
     {
         return TextureCache::get_texture(id);
     }
 
     const texture& TextureCache::get_texture(id_type id)
     {
+        if (m_invalidTexture.id == invalid_id)
+            m_invalidTexture = create_texture("invalid texture", fs::view("engine://resources/invalid/missing"));
+
         async::readonly_guard guard(m_textureLock);
+        if (id == invalid_id)
+            return m_textures[nameHash("invalid texture")];
         return m_textures[id];
     }
 
     texture_data TextureCache::get_data(id_type id)
     {
         texture texture;
+        if (m_invalidTexture.id == invalid_id)
+            m_invalidTexture = create_texture("invalid texture", fs::view("engine://resources/invalid/missing"));
 
         {
             async::readonly_guard guard(m_textureLock);
-            texture = m_textures[id];
+            if (id == invalid_id)
+                texture = m_textures[nameHash("invalid texture")];
+            else
+                texture = m_textures[id];
         }
 
         texture_data data{};
@@ -61,6 +72,12 @@ namespace legion::rendering
 
     texture_handle TextureCache::create_texture(const std::string& name, const fs::view& file, texture_import_settings settings)
     {
+        if (m_invalidTexture.id == invalid_id)
+        {
+            m_invalidTexture.id = 1;
+            m_invalidTexture = create_texture("invalid texture", fs::view("engine://resources/invalid/missing"));
+        }
+
         id_type id = nameHash(name);
 
         {
@@ -82,11 +99,21 @@ namespace legion::rendering
             m_textures.insert(id, result);
         }
 
+        log::debug("Created texture {} with file: {}", name, file.get_filename().decay());
+
         return { id };
     }
 
-    texture_handle TextureCache::create_texture(const std::string& name, texture_import_settings settings)
+    texture_handle TextureCache::create_texture(const fs::view& file, texture_import_settings settings)
     {
+        return create_texture(file.get_filename(), file, settings);
+    }
+
+    texture_handle TextureCache::create_texture_from_image(const std::string& name, texture_import_settings settings)
+    {
+        if (m_invalidTexture.id == invalid_id)
+            m_invalidTexture = create_texture("invalid texture", fs::view("engine://resources/invalid/missing"));
+
         image_handle image = ImageCache::get_handle(name);
         if (image == invalid_image_handle)
         {
@@ -94,11 +121,14 @@ namespace legion::rendering
             return invalid_texture_handle;
         }
 
-        return create_texture(image, settings);
+        return create_texture_from_image(image, settings);
     }
 
-    texture_handle TextureCache::create_texture(image_handle image, texture_import_settings settings)
+    texture_handle TextureCache::create_texture_from_image(image_handle image, texture_import_settings settings)
     {
+        if (m_invalidTexture.id == invalid_id)
+            m_invalidTexture = create_texture("invalid texture", fs::view("engine://resources/invalid/missing"));
+
         if (image == invalid_image_handle)
         {
             log::warn("Tried to create a texture with an invalid image");
@@ -161,11 +191,16 @@ namespace legion::rendering
             m_textures.insert(id, texture);
         }
 
+        log::debug("Created texture from image {}", image.id);
+
         return { id };
     }
 
     texture_handle TextureCache::get_handle(const std::string& name)
     {
+        if (m_invalidTexture.id == invalid_id)
+            m_invalidTexture = create_texture("invalid texture", fs::view("engine://resources/invalid/missing"));
+
         id_type id = nameHash(name);
         async::readonly_guard guard(m_textureLock);
         if (m_textures.contains(id))
@@ -175,6 +210,9 @@ namespace legion::rendering
 
     texture_handle TextureCache::get_handle(id_type id)
     {
+        if (m_invalidTexture.id == invalid_id)
+            m_invalidTexture = create_texture("invalid texture", fs::view("engine://resources/invalid/missing"));
+
         async::readonly_guard guard(m_textureLock);
         if (m_textures.contains(id))
             return { id };

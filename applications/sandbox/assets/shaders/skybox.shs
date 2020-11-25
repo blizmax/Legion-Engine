@@ -1,0 +1,29 @@
+#version 450
+#state CULL OFF
+
+generate(vertex, fragment)
+
+#include <stdio.shinc>
+
+shader(vertex)
+{
+    void main(void)
+    {
+        gl_Position = ModelToScreenSpacePosition(position);
+        PropagateStdIO();
+    }
+}
+
+shader(fragment)
+{
+    out vec4 fragment_color;
+
+    uniform vec4 skycolor;
+
+    void main(void)
+    {
+        vec3 unitDir = normalize(stdin(position));
+
+        fragment_color = vec4(mix(vec3(length(skycolor.rgb)), skycolor.rgb, clamp(dot(unitDir, vec3(0.f, 1.f, 0.f)) + 0.5f, 0.f, 1.f)), 1.f);
+    }
+}
