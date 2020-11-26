@@ -1,11 +1,9 @@
 #pragma once
 #include <core/core.hpp>
-#include <core/math/math.hpp>
 #include "../systems/testsystem.hpp"
-#include "../systems/testsystem2.hpp"
 #include "../systems/simplecameracontroller.hpp"
 
-
+#include <core/math/math.hpp>
 
 using namespace legion;
 
@@ -16,9 +14,8 @@ public:
     {
         addProcessChain("TestChain");
 
-        //reportComponentType<sah>();
-        //reportSystem<TestSystem>();
-        reportSystem<TestSystem2>();
+        reportComponentType<sah>();
+        reportSystem<TestSystem>();
         reportSystem<SimpleCameraController>();
     }
 

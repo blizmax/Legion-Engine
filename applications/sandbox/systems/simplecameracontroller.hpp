@@ -77,9 +77,7 @@ public:
         groundplane.add_components<transform>();
 
         skybox = createEntity();
-        auto skyboxMat = rendering::MaterialCache::create_material("skybox", "assets://shaders/skybox.shs"_view);
-        skyboxMat.set_param("skycolor", math::color(0.2f, 0.4f, 1.0f));
-        skybox.add_component<rendering::renderable>({ rendering::ModelCache::create_model("uvsphere", "assets://models/uvsphere.obj"_view), skyboxMat });
+        skybox.add_component<rendering::renderable>({ rendering::ModelCache::create_model("uvsphere", "assets://models/uvsphere.obj"_view), rendering::MaterialCache::create_material("skybox", "assets://shaders/skybox.shs"_view) });
         skybox.add_components<transform>(position(), rotation(), scale(1000.f));
 
         camera = createEntity();
