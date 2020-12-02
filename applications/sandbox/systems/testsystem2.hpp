@@ -67,43 +67,43 @@ public:
             vertexColor = rendering::MaterialCache::create_material("vertex color", "assets://shaders/vertexcolor.shs"_view);
 
 
-            std::vector<math::vec3> positions{
-                math::vec3(0,1.0f,0),
-                math::vec3(0,1.25f,0),
-                math::vec3(0,1.5f,0),
-                math::vec3(0,1.75f,0),
+            /*   std::vector<math::vec3> positions{
+                   math::vec3(0,1.0f,0),
+                   math::vec3(0,1.25f,0),
+                   math::vec3(0,1.5f,0),
+                   math::vec3(0,1.75f,0),
 
-                math::vec3(1,1.0f,0),
-                math::vec3(1,1.25f,0),
-                math::vec3(1,1.5f,0),
-                math::vec3(1,1.75f,0),
+                   math::vec3(1,1.0f,0),
+                   math::vec3(1,1.25f,0),
+                   math::vec3(1,1.5f,0),
+                   math::vec3(1,1.75f,0),
 
-                math::vec3(1,1.0f,1),
-                math::vec3(1,1.25f,1),
-                math::vec3(1,1.5f,1),
-                math::vec3(1,1.75f,1),
+                   math::vec3(1,1.0f,1),
+                   math::vec3(1,1.25f,1),
+                   math::vec3(1,1.5f,1),
+                   math::vec3(1,1.75f,1),
 
-                math::vec3(0,1.0f,1),
-                math::vec3(0,1.25f,1),
-                math::vec3(0,1.5f,1),
-                math::vec3(0,1.75f,1)
-            };
-            pointCloudParameters params{
-            params.startingSize = math::vec3(0.2f),
-            params.particleMaterial = vertexColor,
-                params.particleModel = cube
-            };
-            auto pointcloud = rendering::ParticleSystemCache::createParticleSystem<PointCloudParticleSystem>("point_cloud", params, positions);
+                   math::vec3(0,1.0f,1),
+                   math::vec3(0,1.25f,1),
+                   math::vec3(0,1.5f,1),
+                   math::vec3(0,1.75f,1)
+               };
+               pointCloudParameters params{
+               params.startingSize = math::vec3(0.2f),
+               params.particleMaterial = vertexColor,
+                   params.particleModel = cube
+               };*/
+               //auto pointcloud = rendering::ParticleSystemCache::createParticleSystem<PointCloudParticleSystem>("point_cloud", params, positions);
 
 #pragma region entities
 
-            {
-                auto ent = createEntity();
-                ent.add_components<transform>(position(-5, 0.01f, 0), rotation(), scale(1));
-                rendering::particle_emitter emitter = ent.add_component<rendering::particle_emitter>().read();
-                emitter.particleSystemHandle = pointcloud;
-                ent.get_component_handle<rendering::particle_emitter>().write(emitter);
-            }
+            //{
+            //    auto ent = createEntity();
+            //    ent.add_components<transform>(position(-5, 0.01f, 0), rotation(), scale(1));
+            //    rendering::particle_emitter emitter = ent.add_component<rendering::particle_emitter>().read();
+            //    emitter.particleSystemHandle = pointcloud;
+            //    ent.get_component_handle<rendering::particle_emitter>().write(emitter);
+            //}
 
             {
                 m_cubeent = createEntity();
@@ -115,23 +115,49 @@ public:
 
 #pragma endregion
             createProcess<&TestSystem2::update>("Update");
-
-
         }
 
         rendering::Renderer::receiveGui += [this]()
         {
-            ImGui::ShowDemoWindow();
+            // ImGui::ShowDemoWindow();
 
             ImGuiIO& io = ImGui::GetIO();
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::BeginFrame();
-            ImGui::Begin("Hello World");
-            EditTransform(value_ptr(view), value_ptr(projection), value_ptr(model), true);
-
-            if (ImGui::Button("Ey look at me!"))
+            bool myToolActive = true;
+            ImGui::Begin("Hello World", &myToolActive, ImGuiWindowFlags_MenuBar);
+            if (ImGui::BeginMenuBar())
             {
-                log::debug("This is called! {}", buffer);
+                if (ImGui::BeginMenu("File"))
+                {
+                    if (ImGui::MenuItem("Save Main", "NO SHORTCUT FOR YOU!!!"))
+                    {
+                        scenemanagement::SceneManager::createScene("Main");
+                        log::debug("Finished Saving");
+                    }
+                    if (ImGui::MenuItem("Save Main2", "NO SHORTCUT FOR YOU!!!"))
+                    {
+                        scenemanagement::SceneManager::createScene("Main2");
+                        log::debug("Finished Saving");
+                    }
+                    if (ImGui::MenuItem("Load Main", "NO SHORTCUT FOR YOU!!!"))
+                    {
+                        scenemanagement::SceneManager::loadScene("Main");
+                        log::debug(scenemanagement::SceneManager::currentScene);
+                        log::debug("Finished loading a scene");
+                    }
+                    if (ImGui::MenuItem("Load Main2", "NO SHORTCUT FOR YOU!!!"))
+                    {
+                        scenemanagement::SceneManager::loadScene("Main2");
+                        log::debug(scenemanagement::SceneManager::currentScene);
+                        log::debug("Finished loading a scene");
+                    }
+                    if (ImGui::MenuItem("Close", "NO SHORTCUT FOR YOU!!!")) { myToolActive = false; }
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
+            }
+            EditTransform(value_ptr(view), value_ptr(projection), value_ptr(model), true);
 
             const auto log_matrix = [](const math::mat4& target,const std::string& name)
             {
@@ -279,7 +305,6 @@ public:
             log::debug("Finished Saving");
         }
     }
-
     void OnSave2(saveScene2* action)
     {
         if (action->pressed())
@@ -297,7 +322,6 @@ public:
             log::debug("Finished loading a scene");
         }
     }
-
     void OnLoad2(loadScene2* action)
     {
         if (action->pressed())
