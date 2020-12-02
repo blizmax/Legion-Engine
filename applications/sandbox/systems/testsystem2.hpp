@@ -125,36 +125,10 @@ public:
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::BeginFrame();
             bool myToolActive = true;
-            ImGui::Begin("Hello World", &myToolActive, ImGuiWindowFlags_MenuBar);
+            ImGui::Begin("Hello World");
             if (ImGui::BeginMenuBar())
             {
-                if (ImGui::BeginMenu("File"))
-                {
-                    if (ImGui::MenuItem("Save Main", "NO SHORTCUT FOR YOU!!!"))
-                    {
-                        scenemanagement::SceneManager::createScene("Main");
-                        log::debug("Finished Saving");
-                    }
-                    if (ImGui::MenuItem("Save Main2", "NO SHORTCUT FOR YOU!!!"))
-                    {
-                        scenemanagement::SceneManager::createScene("Main2");
-                        log::debug("Finished Saving");
-                    }
-                    if (ImGui::MenuItem("Load Main", "NO SHORTCUT FOR YOU!!!"))
-                    {
-                        scenemanagement::SceneManager::loadScene("Main");
-                        log::debug(scenemanagement::SceneManager::currentScene);
-                        log::debug("Finished loading a scene");
-                    }
-                    if (ImGui::MenuItem("Load Main2", "NO SHORTCUT FOR YOU!!!"))
-                    {
-                        scenemanagement::SceneManager::loadScene("Main2");
-                        log::debug(scenemanagement::SceneManager::currentScene);
-                        log::debug("Finished loading a scene");
-                    }
-                    if (ImGui::MenuItem("Close", "NO SHORTCUT FOR YOU!!!")) { myToolActive = false; }
-                    ImGui::EndMenu();
-                }
+
                 ImGui::EndMenuBar();
             }
             EditTransform(value_ptr(view), value_ptr(projection), value_ptr(model), true);
@@ -241,6 +215,29 @@ public:
                         open = true;
                     if (ImGui::MenuItem("Save", NULL))
                         save = true;
+                    if (ImGui::MenuItem("Save Main", "NO SHORTCUT FOR YOU!!!"))
+                    {
+                        scenemanagement::SceneManager::createScene("Main");
+                        log::debug("Finished Saving");
+                    }
+                    if (ImGui::MenuItem("Save Main2", "NO SHORTCUT FOR YOU!!!"))
+                    {
+                        scenemanagement::SceneManager::createScene("Main2");
+                        log::debug("Finished Saving");
+                    }
+                    if (ImGui::MenuItem("Load Main", "NO SHORTCUT FOR YOU!!!"))
+                    {
+                        scenemanagement::SceneManager::loadScene("Main");
+                        log::debug(scenemanagement::SceneManager::currentScene);
+                        log::debug("Finished loading a scene");
+                    }
+                    if (ImGui::MenuItem("Load Main2", "NO SHORTCUT FOR YOU!!!"))
+                    {
+                        scenemanagement::SceneManager::loadScene("Main2");
+                        log::debug(scenemanagement::SceneManager::currentScene);
+                        log::debug("Finished loading a scene");
+                    }
+                    if (ImGui::MenuItem("Close", "NO SHORTCUT FOR YOU!!!")) { myToolActive = false; }
 
                     ImGui::EndMenu();
                 }
