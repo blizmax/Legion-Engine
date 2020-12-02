@@ -17,6 +17,11 @@
 
 using namespace legion;
 
+struct saveScene1 : public app::input_action<saveScene1> {};
+struct saveScene2 : public app::input_action<saveScene2> {};
+struct loadScene1 : public app::input_action<loadScene1> {};
+struct loadScene2 : public app::input_action<loadScene2> {};
+
 void EditTransform(const float* cameraView, const float* cameraProjection, float* matrix, bool editTransformDecomposition);
 
 class TestSystem2 final : public System<TestSystem2>
@@ -39,12 +44,20 @@ public:
         rendering::material_handle vertexColor;
         rendering::material_handle directionalLightMH;
 
+        app::InputSystem::createBinding<saveScene1>(app::inputmap::method::F1);
+        app::InputSystem::createBinding<saveScene2>(app::inputmap::method::F2);
+        app::InputSystem::createBinding<loadScene1>(app::inputmap::method::F3);
+        app::InputSystem::createBinding<loadScene2>(app::inputmap::method::F4);
+
+        bindToEvent<saveScene1, &TestSystem2::OnSave1>();
+        bindToEvent < saveScene2, &TestSystem2::OnSave2>();
+        bindToEvent<loadScene1, &TestSystem2::OnLoad1>();
+        bindToEvent<loadScene2, &TestSystem2::OnLoad2>();
         app::window window = m_ecs->world.get_component_handle<app::window>().read();
 
         {
             async::readwrite_guard guard(*window.lock);
             app::ContextHelper::makeContextCurrent(window);
-
 
             auto colorshader = rendering::ShaderCache::create_shader("color", "assets://shaders/color.shs"_view);
             directionalLightMH = rendering::MaterialCache::create_material("directional light", colorshader);
@@ -106,7 +119,6 @@ public:
 
         }
 
-
         rendering::Renderer::receiveGui += [this]()
         {
             ImGui::ShowDemoWindow();
@@ -117,6 +129,9 @@ public:
             ImGui::Begin("Hello World");
             EditTransform(value_ptr(view), value_ptr(projection), value_ptr(model), true);
 
+            if (ImGui::Button("Ey look at me!"))
+            {
+                log::debug("This is called! {}", buffer);
 
             const auto log_matrix = [](const math::mat4& target,const std::string& name)
             {
@@ -254,6 +269,43 @@ public:
             mscaleh.write(mscale);
         }
 
+    }
+
+    void OnSave1(saveScene1* action)
+    {
+        if (action->pressed())
+        {
+            scenemanagement::SceneManager::createScene("Main");
+            log::debug("Finished Saving");
+        }
+    }
+
+    void OnSave2(saveScene2* action)
+    {
+        if (action->pressed())
+        {
+            scenemanagement::SceneManager::createScene("Main2");
+            log::debug("Finished Saving");
+        }
+    }
+    void OnLoad1(loadScene1* action)
+    {
+        if (action->pressed())
+        {
+            scenemanagement::SceneManager::loadScene("Main");
+            log::debug(scenemanagement::SceneManager::currentScene);
+            log::debug("Finished loading a scene");
+        }
+    }
+
+    void OnLoad2(loadScene2* action)
+    {
+        if (action->pressed())
+        {
+            scenemanagement::SceneManager::loadScene("Main2");
+            log::debug(scenemanagement::SceneManager::currentScene);
+            log::debug("Finished loading a scene");
+        }
     }
 };
 
