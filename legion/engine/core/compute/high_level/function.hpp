@@ -34,9 +34,12 @@ namespace legion::core::compute {
     };
     }
 
+    struct invalid_karg_type {};
+
 
     struct karg
     {
+        karg(invalid_karg_type) {}
         template <class T>
         karg(T& v, const std::string& n = "") : container(&v,sizeof(T)), name(n) {}
         karg(const karg&) = default;
@@ -49,7 +52,6 @@ namespace legion::core::compute {
         std::string name;
     };
 
-    struct invalid_karg_type {};
 
 
     /**
